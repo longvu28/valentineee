@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine 💖</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; padding: 50px; }
+        button { padding: 10px 20px; font-size: 18px; margin: 10px; cursor: pointer; }
+        .yes { background-color: pink; border: none; }
+        .no { background-color: lightgray; border: none; }
+    </style>
+</head>
+<body>
+
+    <h1>Bạn có đồng ý làm Valentine của tôi không? 💖</h1>
+    
+    <button class="yes" onclick="sendData('Có')">Có ❤️</button>
+    <button class="no" onclick="sendData('Không')">Không 💔</button>
+
+    <p id="status"></p>
+
+    <script>
+        function sendData(choice) {
+            let formURL = "https://docs.google.com/forms/d/e/1FAIpQLSeBBskVKz3E3T_8ndxWDNPOoAgQsy1ee74H_Gt3iyEICmO0YA/formResponse";
+            let data = new FormData();
+            data.append("entry.848110144", choice);
+
+            fetch(formURL, { method: "POST", body: data, mode: "no-cors" })
+                .then(() => document.getElementById("status").innerText = "Cảm ơn bạn đã trả lời! 💖")
+                .catch(() => document.getElementById("status").innerText = "Lỗi! Vui lòng thử lại.");
+        }
+    </script>
+
+</body>
+</html>

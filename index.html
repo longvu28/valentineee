@@ -19,18 +19,24 @@
     <button class="no" onclick="sendData('Không')">Không 💔</button>
 
     <p id="status"></p>
-
     <script>
         function sendData(choice) {
             let formURL = "https://docs.google.com/forms/d/e/1FAIpQLSeBBskVKz3E3T_8ndxWDNPOoAgQsy1ee74H_Gt3iyEICmO0YA/formResponse";
-            let data = new FormData();
-            data.append("entry.848110144", choice);
-
-            fetch(formURL, { method: "POST", body: data, mode: "no-cors" })
-                .then(() => document.getElementById("status").innerText = "Cảm ơn bạn đã trả lời! 💖")
-                .catch(() => document.getElementById("status").innerText = "Lỗi! Vui lòng thử lại.");
+            let params = new URLSearchParams();
+            params.append("entry.848110144", choice);
+        
+            fetch(formURL, {
+                method: "POST",
+                body: params,
+                mode: "no-cors"
+            }).then(() => {
+                document.getElementById("status").innerText = "Cảm ơn bạn đã trả lời! 💖";
+            }).catch(() => {
+                document.getElementById("status").innerText = "Lỗi! Vui lòng thử lại.";
+            });
         }
-    </script>
+        </script>
+        
 
 </body>
 </html>

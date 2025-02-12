@@ -3,40 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valentine 💖</title>
+    <title>Valentine của Bạn ❤️</title>
+    <audio autoplay loop volume="0.7">
+        <source src="./Music.mp3" type="audio/mpeg">
+    </audio>
     <style>
-        body { text-align: center; font-family: Arial, sans-serif; padding: 50px; }
-        button { padding: 10px 20px; font-size: 18px; margin: 10px; cursor: pointer; }
-        .yes { background-color: pink; border: none; }
-        .no { background-color: lightgray; border: none; }
+        body {
+            background: linear-gradient(120deg, #ff9a9e, #fad0c4);
+            text-align: center;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            overflow: hidden;
+            margin: 0;
+        }
+        h1, .buttons {
+            display: none;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .buttons {
+            display: none; 
+            gap: 20px;
+        }
+        button {
+            background: #ff4e50;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            background: #fc6076;
+            transform: scale(1.1);
+        }
+        .gift-box {
+            width: 120px;
+            height: 120px;
+            background: red;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+        .gift-box:before {
+            content: "🎀";
+            position: absolute;
+            top: -20px;
+            font-size: 50px;
+            color: gold;
+        }
+        .heart {
+            position: absolute;
+            color: red;
+            font-size: 2rem;
+            animation: float 3s linear infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .toast.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
-
-    <h1>Bạn có đồng ý làm Valentine của tôi không? 💖</h1>
+    <div class="gift-box" id="giftBox">🎁</div>
+    <h1 id="valentineQuestion">Are You My Valentine? (Try pressing "No" ^^) 💖</h1>
+    <div class="buttons" id="buttons">
+        <button id="valentineYes">Yes ❤️</button>
+        <button id="valentineNo">No 💔</button>
+    </div>
+    <div id="toast" class="toast">Đã gửi thành công!</div>
     
-    <button class="yes" onclick="sendData('Có')">Có ❤️</button>
-    <button class="no" onclick="sendData('Không')">Không 💔</button>
-
-    <p id="status"></p>
     <script>
-        function sendData(choice) {
-            let formURL = "https://docs.google.com/forms/d/e/1FAIpQLSeBBskVKz3E3T_8ndxWDNPOoAgQsy1ee74H_Gt3iyEICmO0YA/formResponse";
-            let params = new URLSearchParams();
-            params.append("entry.848110144", choice);
-        
-            fetch(formURL, {
+        let noClickCount = 0;
+
+        document.getElementById("giftBox").addEventListener("click", function() {
+            this.style.display = "none";
+            document.getElementById("valentineQuestion").style.display = "block";
+            document.getElementById("buttons").style.display = "flex";
+        });
+
+        document.getElementById("valentineYes").addEventListener("click", function() {
+            sendResponse("Có ❤️");
+            createHeart();
+        });
+
+        document.getElementById("valentineNo").addEventListener("click", function() {
+            noClickCount++;
+            if (noClickCount < 10) {
+                this.style.position = "absolute";
+                this.style.left = Math.random() * 80 + "vw";
+                this.style.top = Math.random() * 80 + "vh";
+            } else if (noClickCount === 10) {
+                this.textContent = "Có ❤️";
+                this.id = "valentineYes";
+                this.addEventListener("click", function() {
+                    sendResponse("Có ❤️");
+                    createHeart();
+                });
+            } else {
+                sendResponse("Có ❤️");
+                createHeart();
+            }
+        });
+
+        function sendResponse(answer) {
+            const formData = new FormData();
+            formData.append("entry.848110144", answer);
+
+            fetch("https://docs.google.com/forms/d/e/1FAIpQLSeBBskVKz3E3T_8ndxWDNPOoAgQsy1ee74H_Gt3iyEICmO0YA/formResponse", {
                 method: "POST",
-                body: params,
+                body: formData,
                 mode: "no-cors"
             }).then(() => {
-                document.getElementById("status").innerText = "Cảm ơn bạn đã trả lời! 💖";
-            }).catch(() => {
-                document.getElementById("status").innerText = "Lỗi! Vui lòng thử lại.";
+                showToast();
+            }).catch((error) => {
+                console.error("Lỗi:", error);
             });
         }
-        </script>
-        
 
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        function createHeart() {
+            const heart = document.createElement("div");
+            heart.classList.add("heart");
+            heart.innerHTML = "❤️";
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.top = "100vh";
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
